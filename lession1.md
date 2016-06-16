@@ -1,5 +1,7 @@
 ##有关angularjs的概述
-angularjs是一种单页面应用的解决方案。大体使用结构如下：<br />
+angularjs是一种单页面应用的解决方案。<br />
+共分为：module(模块)，controller（控制器），directive（指令），service（服务），filter（过滤器）几大模块。<br />
+大体使用结构如下：<br />
 ```
 
     <!doctype html>

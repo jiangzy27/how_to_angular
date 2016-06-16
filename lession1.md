@@ -17,6 +17,7 @@ angularjs是一种单页面应用的解决方案。<br />
             <div menu-slide>
                 <span>{{name | frozenStatusFilter:"active"}}</span>
             </div>
+            <button ng-click="func()"></button>
         </div>
     </body>
     </html>

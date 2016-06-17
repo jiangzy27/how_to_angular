@@ -11,8 +11,6 @@
     <head>
         <meta charset="UTF-8">
         <title>angular</title>
-        <script src="jquery.js"></script>
-        <script src="angular.js"></script>
     </head>
     <body>
         <div ng-controller="sidebarCtrl">

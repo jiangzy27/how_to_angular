@@ -68,7 +68,6 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>自定义指令</title>
-    <link rel="stylesheet" href="../../public/lib/bootstrap/dist/css/bootstrap.css"/>
 </head>
 <body ng-controller="myCtrl">
 父ctrl:{{zhangsan}}<br/>
@@ -78,7 +77,7 @@
 <person namexx="zhangsan"></person>
 </body>
 </html>
-<script src="../../public/lib/angular/angular.js"></script>
+<script src="./lib/angular.js"></script>
 <script>
     /*
 

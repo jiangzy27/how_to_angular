@@ -1,5 +1,5 @@
 ##有关控制器controller
-###controller其实就是规定了一个作用域。看一下这段代码：<br />
+###controller其实就是规定了一个作用域。
 ```
 <!DOCTYPE html>
 <html lang="en" ng-app="myMod">

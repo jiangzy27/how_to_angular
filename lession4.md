@@ -19,7 +19,7 @@
     </ul>
 </body>
 </html>
-<script src="./lib/angular/angular.js"></script>
+<script src="./lib/angular.js"></script>
 <script>
     angular.module('myMod',[])
             .controller('myCtrl',function($scope){

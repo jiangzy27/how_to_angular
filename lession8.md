@@ -17,10 +17,6 @@
 </html>
 <script src="./lib/angular.js"></script>
 <script>
-    /*
-     * 装饰性指令：注入http服务，请求远程地址数据并渲染节点。
-     *
-     * */
     angular.module('myMod',[])
             //定义一个指令，指令名字，指令定义
             .directive('redclick',function($http){

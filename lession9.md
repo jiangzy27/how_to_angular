@@ -35,6 +35,7 @@
      &:单向继承父scope中的函数。
 
      */
+    var module = angular.module('myMod',[]);
     module.controller('myCtrl',function($scope){
         $scope.zhangsan='张三';
         $scope.greet = function(name,word){

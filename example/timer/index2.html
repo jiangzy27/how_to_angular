@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html ng-app="myMod">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>倒计时定时器指令实现</title>
+    <link href="../../lib/bootstrap-3.3.5-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="../../lib/jquery.js"></script>
+    <script src="../../lib/angular.js"></script>
+</head>
+<body ng-controller="myCtrl">
+<check-code></check-code>
+</body>
+</html>
+<script>
+
+    var module = angular.module('myMod',[]);
+    module.controller('myCtrl',function($scope){
+
+
+    });
+    module.directive('checkCode',function($interval){
+        return {
+            restrict:'E',
+            replace:true,
+            scope:{},
+            templateUrl:'tpl.html',
+            link:function(scope,ele,attrs){
+
+                scope.state = true;
+                scope.text = "点击获取验证码";
+
+                scope.getCode = function(){
+
+                    scope.state = false;
+
+                    var count = 6;
+                    scope.text  = "倒计时"+count+'秒';
+                    var timer = $interval(function(){
+                        //$scope.state = false;
+
+                        count--;
+                        scope.text  = "倒计时"+count+'秒';
+                        if(count <=0){
+                            count =0;
+                            $interval.cancel(timer);
+                            scope.state = true;
+                            scope.text = "点击获取验证码";
+                        }
+                    },1000);
+                }
+            }
+        };
+    });
+
+</script>

@@ -38,10 +38,15 @@ npm install -g ssr
 我们还有一种方法介绍。
 
 我们先看一下模拟数据会遇到的问题：
+
     1. 数据太长了，将数据写在js文件里，完成后挨个改url。
+
     2. 某些逻辑复杂的代码，加入或去除模拟数据时得小心翼翼。
+
     3. 想要尽可能还原真实的数据，要么编写更多代码，要么手动修改模拟数据。
+
     4. 特殊的格式，例如IP,随机数，图片，地址，需要去收集。
+
     5. 超烂的破网速…
 
 比如，我们需要请求一个列表页数据，这个数据一般是很多的，我们可以用复制粘贴的方式写json，
@@ -62,7 +67,9 @@ $('<pre>').text(JSON.stringify(data, null, 4))
 </script>
 ```
 下面介绍一下语法，mock.js语法规范包含两部分：
+
     1. 数据模板定义（Data Temaplte Definition，DTD）
+
     2. 数据占位符定义（Data Placeholder Definition，DPD）
 
 ####数据模板定义
@@ -79,11 +86,18 @@ $('<pre>').text(JSON.stringify(data, null, 4))
 属性名 和 生成规则 之间用 | 分隔。<br />
 生成规则 是可选的。<br />
 生成规则 有 7 种格式：
+
     1. 'name|min-max': value
+
     2. 'name|count': value
+
+
     3. 'name|min-max.dmin-dmax': value
     4. 'name|min-max.dcount': value
+
     5. 'name|count.dmin-dmax': value
+
     6. 'name|count.dcount': value
+
     7. 'name|+step': value
 

@@ -91,8 +91,8 @@ $('<pre>').text(JSON.stringify(data, null, 4))
 
     2. 'name|count': value
 
-
     3. 'name|min-max.dmin-dmax': value
+    
     4. 'name|min-max.dcount': value
 
     5. 'name|count.dmin-dmax': value

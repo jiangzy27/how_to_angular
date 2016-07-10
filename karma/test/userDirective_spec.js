@@ -12,8 +12,8 @@
 
         }));
         it('看看指令是否正确？',function(){
-            $rootScope.name = 'hehe';
-           var element = $compile('<user></user>')($rootScope);
+            $rootScope.name = 'hehe';//模拟scope
+           var element = $compile('<user name="name"></user>')($rootScope);
             $rootScope.$digest();//触发所有监听,强行用scope的变量刷新视图
             expect(element.html()).toContain('hehe');
 

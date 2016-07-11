@@ -137,10 +137,10 @@ $('<pre>').text(JSON.stringify(data, null, 4))
        @占位符(参数 [, 参数])<br />
 
 ####注意
-       用 @ 来标识其后的字符串是 占位符。<br />
-       占位符 引用的是 Mock.Random 中的方法。<br />
-       通过 Mock.Random.extend() 来扩展自定义占位符。<br />
-       占位符 也可以引用 数据模板 中的属性。<br />
-       占位符 会优先引用 数据模板 中的属性.<br />
+用 @ 来标识其后的字符串是 占位符。<br />
+占位符 引用的是 Mock.Random 中的方法。<br />
+通过 Mock.Random.extend() 来扩展自定义占位符。<br />
+占位符 也可以引用 数据模板 中的属性。<br />
+占位符 会优先引用 数据模板 中的属性.<br />
 
-       参考：http://www.tuicool.com/articles/N7Rjie3
+参考：http://www.tuicool.com/articles/N7Rjie3

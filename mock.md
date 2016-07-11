@@ -101,7 +101,7 @@ $('<pre>').text(JSON.stringify(data, null, 4))
 
     7. 'name|+step': value
 
-    **生成规则**：
+**生成规则**：
 
     1. 属性值是字符串 String
 
@@ -136,7 +136,7 @@ $('<pre>').text(JSON.stringify(data, null, 4))
        @占位符<br />
        @占位符(参数 [, 参数])<br />
 
-       ####注意
+####注意
        用 @ 来标识其后的字符串是 占位符。<br />
        占位符 引用的是 Mock.Random 中的方法。<br />
        通过 Mock.Random.extend() 来扩展自定义占位符。<br />

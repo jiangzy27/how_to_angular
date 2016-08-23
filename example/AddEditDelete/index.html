@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>学生管理系统</title>
+
+    <link href="../../lib/bootstrap-3.3.5-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="../../lib/jquery.js"></script>
+    <script src="../../lib/angular.js"></script>
+
+</head>
+<body ng-controller="FormController">
+<div>
+    <input type="text" ng-model="newId" placeholder="输入id" />
+    <input type="text" ng-model="newName" placeholder="输入名字" />
+    <input type="text" ng-model="newGrade" placeholder="输入专业" />
+    <button class="btn btn-primary" ng-click="addStudent()">增加</button>
+
+
+</div>
+
+
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>名字</th>
+            <th>专业</th>
+            <th>操作</th>
+        </tr>
+        <tr ng-repeat="item in students | orderBy:'Id'">
+            <td><span style="color:brown" ng-show="!item['status']">{{item['Id']}}</span> <input  type="text" ng-show="item['status']"  ng-model="item['Id']"/></td>
+            <td><span style="color:brown" ng-show="!item['status']">{{item['Name']}}</span> <input  type="text" ng-show="item['status']"  ng-model="item['Name']"/></td>
+            <td><span style="color:brown" ng-show="!item['status']">{{item['Grade']}}</span> <input  type="text" ng-show="item['status']"  ng-model="item['Grade']"/></td>
+            <td>
+                <a ng-show="item['status']" ng-click="saveStudent(item)">保存</a>
+                <a ng-show="!item['status']" ng-click="editStudent(item)">修改</a>
+                <a ng-click="deleteStudent(item)">删除</a>
+            </td>
+        </tr>
+
+    </table>
+<div>
+    <button class="btn btn-info" ng-click="submit()">提交</button>
+</div>
+</body>
+</html>
+
+<script>
+    /*
+    *    一定深刻理解数据驱动的概念：
+    * 1.每条数据都要加一个status状态，单独控制这一条数据的状态
+    * 2.input输入框，ng-model双向绑定此条数据，视图修改会直接体现到$scope.students上。
+    * */
+    var myModule=angular.module('myModule',[]).
+            controller('FormController',function($scope){
+
+                $scope.students=[
+                    {Name:'小李',Id:'201401205',Grade:'计算机技术',status:false},
+                    {Name:'小王',Id:'201401202',Grade:'应用数学',status:false},
+                    {Name:'小姬',Id:'201401209',Grade:'高能物理',status:false},
+                    {Name:'张小三',Id:'201401201',Grade:'生物科学',status:false}
+                ];
+
+                $scope.editStudent = function(student){
+
+                    var index = $scope.students.indexOf(student);
+                    if(index > -1){
+                        $scope.students[index]['status'] = true;
+                    }
+
+
+
+                };
+                $scope.saveStudent =function(student){
+                    $scope.status = false;
+                    var index = $scope.students.indexOf(student);
+                    if(index > -1) {
+
+                        $scope.students[index]['status'] = false;
+                    }
+                   // console.log($scope.students);
+                };
+                $scope.addStudent=function(){       //添加学生函数
+                    $scope.students.push({Name:$scope.newName,Id:$scope.newId,Grade:$scope.newGrade});
+                    $scope.newName='';
+                    $scope.newId='';
+                    $scope.newGrade='';
+                };
+                $scope.deleteStudent=function(student){   //删除一行的内容
+                    $scope.students.splice($scope.students.indexOf(student),1);
+                };
+                $scope.submit = function(){
+
+                    console.log($scope.students);
+                }
+            });
+</script>

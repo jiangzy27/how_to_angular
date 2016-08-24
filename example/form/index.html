@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>表单验证</title>
+    <script src="http://mockjs.com/dist/mock-min.js"></script>
+    <link href="../../lib/bootstrap-3.3.5-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="../../lib/jquery.js"></script>
+    <script src="../../lib/angular.js"></script>
+</head>
+<body ng-controller="formController">
+<form name="signup_form" novalidate ng-submit="signupForm()">
+    <fieldset>
+        <legend>注册</legend>
+        <div>
+            <div>
+                <label>用户名</label>
+                <input type="text"
+                       placeholder="请输入用户名"
+                       name="name"
+                       ng-model="signup.name"
+                       ng-minlength=6
+                       ng-maxlength=20 required />
+                <div class="error"
+                     ng-show="signup_form.name.$dirty && signup_form.name.$invalid && signup_form.submitted">
+
+                    <small class="error"
+                           ng-show="signup_form.name.$error.required">
+                                用户名不可为空
+                    </small>
+                    <small class="error"
+                           ng-show="signup_form.name.$error.minlength">
+                                不少于6个字符
+                    </small>
+                    <small class="error"
+                           ng-show="signup_form.name.$error.maxlength">
+                                最多20个字符
+                    </small>
+                </div>
+            </div>
+
+
+            <div>
+                <label>邮箱</label>
+                <input type="text"
+                       placeholder="请输入邮箱"
+                       value="aaa@qq.com"
+                       name="email"
+                       ng-model="signup.email"
+                       ng-pattern="/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/"
+                       ensure-unique  required />
+                <div class="error"
+                     ng-show="signup_form.email.$dirty && signup_form.email.$invalid && signup_form.submitted">
+                    <small class="error"
+                           ng-show="signup_form.email.$error.required">
+                                邮箱不可为空
+                    </small>
+                    <small class="error"
+                           ng-show="signup_form.email.$error.pattern">
+                                邮箱格式不正确
+                    </small>
+                    <small class="error"
+                           ng-show="signup_form.email.$error.unique">
+                                邮箱已经被占用
+                    </small>
+
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="button radius">提交</button>
+    </fieldset>
+</form>
+</body>
+</html>
+<script>
+//配置数据，随机生成真假数据，比例是1/2
+Mock.mock('http://www.test.com/api/check/email', {
+    'isUnique|1': false
+
+
+});
+
+
+var app=angular.module('myModule',[]);
+app.controller('formController', ['$scope', function($scope) {
+    $scope.submitted = false;
+    $scope.signupForm = function() {
+        console.log($scope.signup_form.$valid);
+        if ($scope.signup_form.$valid) {
+            alert('ok');
+        } else {
+            $scope.signup_form.submitted = true;
+        }
+    }
+}]);
+
+//自定义验证：远程验证邮箱是否被占用
+app.directive('ensureUnique', ['$http', function($http) {
+    return {
+        require: 'ngModel',
+        link: function(scope, ele, attrs, controller) {
+            console.log(controller);
+            scope.$watch(attrs.ngModel, function() {
+                $http({
+                    method: 'POST',
+                    url: 'http://www.test.com/api/check/email',
+                    data: {'email': $(ele).val()}
+
+                }).success(function(data, status, headers, cfg) {
+                    console.log("email status:"+data.isUnique);
+                    controller.$setValidity('unique', data.isUnique);
+
+
+                }).error(function(data, status, headers, cfg) {
+                    console.log('email wrong');
+                    controller.$setValidity('unique', false);
+                });
+            });
+        }
+    }
+}]);
+</script>

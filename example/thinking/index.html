@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>重构思想</title>
+    <script src="http://mockjs.com/dist/mock-min.js"></script>
+    <link href="../../lib/bootstrap-3.3.5-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="../../lib/jquery.js"></script>
+    <script src="../../lib/angular.js"></script>
+<body>
+<div  id="app">
+    <div  ng-controller="searchCtrl">
+        <test task-id="taskId"></test>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    //丢弃requirejs等，达到最简洁化。
+    var app = angular.module("app",[]);
+
+</script>
+<script src="controller.js"></script>
+<script src="service.js"></script>
+
+<script src="directive.js"></script>
+<script>
+    //手动启动app，不需要声明ng-app，只标识起始div即可。
+
+    angular.bootstrap(document.getElementById('app'),['app']);
+</script>

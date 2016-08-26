@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>指令问题</title>
+    <script src="../../lib/angular.js"></script>
+</head>
+<body ng-controller="myCtrl">
+    <test val="val"></test>
+</body>
+</html>
+<script>
+    var app = angular.module("app",[]);
+
+    app.controller('myCtrl',function($scope,$timeout){
+        $scope.val = '';
+        $timeout(function(){
+           $scope.val = 123;
+        },2000);
+    });
+    app.directive('test',function($timeout){
+        return {
+            template:'<div>test value</div>',
+            scope:{val:'='},
+            link:function(scope,ele,attrs){
+                console.log(scope.val);//打印是空
+                $timeout(function(){console.log(scope.val);},1000);//等待时间不够，还是空
+                //监控
+                var unbindWatch = scope.$watch('val',function(newVal,oldVal){
+                    if(newVal != oldVal){
+                        alert(newVal);
+                        unbindWatch();
+                    }
+                });
+            }
+        };
+    });
+</script>

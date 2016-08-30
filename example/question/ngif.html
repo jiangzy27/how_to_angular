@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>ng-if的独立作用域问题</title>
+    <script src="../../lib/angular.js"></script>
+</head>
+<body ng-controller="myCtrl">
+
+    <div ng-if="a==1">
+
+        {{money}}
+        <input type="text" ng-model="money"/>
+        {{info.money}}
+        <input type="text" ng-model="info.money"/>
+    </div>
+    <div>
+        <button ng-click="sub()">提交</button>
+    </div>
+</body>
+</html>
+
+<script>
+//从这个例子我们看到，我们改变了ng-model的值，但是最后提交获取的，还是老的值，因为ng-if创建了独立作用域，
+// 你改了money的值，其实存活空间是ng-if指令里面的作用域，而在myCtrl里面获取不到新的money值的。
+//如果我们使用了ng-show，就不会出现这样的情况，
+// ng-if和ng-show两个指令存在这个比较重要的不同之处，一定多注意！
+
+
+    var app = angular.module("app",[]);
+    app.controller('myCtrl',function($scope){
+        $scope.a = 1;
+        $scope.money = 100;
+        $scope.info = {};
+        $scope.info.money = 200;
+
+        $scope.sub = function(){
+            console.log($scope.money);//脏值
+            console.log($scope.info.money);//新值
+        }
+
+    });
+</script>

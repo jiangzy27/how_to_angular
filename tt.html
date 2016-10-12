@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>自定义指令</title>
+</head>
+<body ng-app="myMod">
+    <div ng-controller="myCtrl">
+
+
+        <hello my-name="myName" say-name="sayName()"></hello>
+    </div>
+
+
+</body>
+</html>
+<script src="./lib/angular.js"></script>
+<script>
+
+    var module = angular.module('myMod',[]);
+    module.controller('myCtrl',function($scope){
+        $scope.myName = "tommy";
+        $scope.sayName =function(){
+            console.log($scope.myName);
+        }
+    });
+    module.directive('hello',function($timeout){
+        return {
+
+            scope:{
+                myName:'=myName',
+                sayName:'&sayName'
+            },
+            template:'<button ng-click="testName()">testValue</button>',
+            link:function(scope,ele,attrs){
+                scope.testName = function(){
+                    scope.myName = 'john';
+                    $timeout(function(){
+                        scope.sayName();
+                    },0);
+                }
+
+            }
+        };
+    });
+
+
+    console.log('a');
+    setTimeout(function(){console.log('b');},0);
+    console.log('c');
+</script>

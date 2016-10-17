@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>表单验证--结合directive分段验证</title>
+    <script src="http://mockjs.com/dist/mock-min.js"></script>
+    <link href="./bootstrap.min.css" rel="stylesheet">
+    <!--<link rel="stylesheet" href="./themes.css"/>-->
+    <script src="../../lib/jquery.js"></script>
+    <script src="../../lib/angular.js"></script>
+    <style>
+        .table-style12 {
+            border-top: none;
+            border-bottom: 1px solid #E8E8E8;
+        }
+        .vip-table { border-top: 1px solid #eaeaea; }
+        .vip-table h5 { margin-left: 15px; }
+        .vip-table thead th { padding: 5px 5px; border-right: none; }
+        .vip-table tbody th { padding: 15px 20px; border-right: 1px solid #eaeaea; width: 190px; }
+        .vip-table td, .vip-table th { border-top: 1px solid #eaeaea; text-align: left; background: #fff; }
+        .vip-table td { padding: 15px 20px; border-right: 1px solid #eaeaea; }
+        .vip-table.vborder-l td{border-left: 1px solid #eaeaea;}
+        .vip-table th { background: #fafafa; font-weight: normal; color: #666; }
+        .table-style12 { border-top: none; border-bottom: 1px solid #E8E8E8; }
+
+        .small_error{
+            color:#f00;
+            margin-left: 50px;
+            vertical-align: 3px;
+        }
+    </style>
+</head>
+<body ng-controller="formController">
+<div>
+    <div>
+        <form name="signup_form" novalidate ng-submit="signupForm()">
+            <table class="table vip-table table-style12">
+                <thead>
+                <tr>
+                    <th colspan="3"><h5>用户信息</h5></th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <my-name></my-name>
+                <my-email></my-email>
+
+                </tbody>
+            </table>
+            <hr/>
+            <button type="submit" class="button radius">提交</button>
+
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
+<script>
+/*1.忽视焦点时，做验证。
+  2.点击提交，做每个字段的验证。
+* 2.初次进入表单时，如果已有内容，不做验证，点击提交时验证
+* */
+//配置数据，随机生成真假数据，比例是1/2
+Mock.mock('http://www.test.com/api/check/email', {
+    'isUnique|1': false
+
+
+});
+
+
+var app=angular.module('myModule',[]);
+app.controller('formController', ['$scope', function($scope) {
+    //初始化文本框的值。
+    $scope.signup = {};
+    $scope.signup.name = 'aa';
+    $scope.signup.email = 'aaaaaa@qq.com';
+    //提交动作
+    $scope.signupForm = function() {
+        console.log($scope.signup_form.$valid);
+        if ($scope.signup_form.$valid) {
+            //如果验证都没有问题
+            alert('ok');
+        } else {
+            alert('no');
+        }
+    }
+}]);
+app.directive('myName',function(){
+    return {
+        templateUrl:'./templates/name.html',
+        restrict: 'ACE',
+        replace:'true',
+        scope:true,
+        link:function(scope,ele,attrs){
+            alert(scope.signup.name);
+        }
+    };
+});
+app.directive('myEmail',function(){
+    return {
+        templateUrl:'./templates/email.html',
+        restrict: 'ACE',
+        replace:'true',
+        scope:true,
+        link:function(scope,ele,attrs){
+
+        }
+    };
+});
+//自定义验证：远程验证邮箱是否被占用
+app.directive('ensureUnique', ['$http', function($http) {
+    return {
+        require: 'ngModel',
+        link: function(scope, ele, attrs, controller) {
+            console.log(controller);
+            scope.$watch(attrs.ngModel, function() {
+                $http({
+                    method: 'POST',
+                    url: 'http://www.test.com/api/check/email',
+                    data: {'email': $(ele).val()}
+
+                }).success(function(data, status, headers, cfg) {
+                    console.log("email status:"+data.isUnique);
+                    controller.$setValidity('unique', data.isUnique);
+
+
+                }).error(function(data, status, headers, cfg) {
+                    console.log('email wrong');
+                    controller.$setValidity('unique', false);
+                });
+            });
+        }
+    }
+}]);
+
+</script>

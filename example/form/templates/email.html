@@ -1,0 +1,24 @@
+
+<tr>
+    <th><span class="shall">*</span> 邮箱</th>
+    <td class="form-group">
+        <input type="text"
+               placeholder="请输入邮箱"
+               name="email"
+               ng-model="signup.email"
+               ng-pattern="/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/"
+               ensure-unique  required />
+        <small class="small_error error"
+               ng-show="signup_form.email.$error.required">
+            邮箱不可为空
+        </small>
+        <small class="small_error error"
+               ng-show="signup_form.email.$error.pattern">
+            邮箱格式不正确
+        </small>
+        <small class="small_error error"
+               ng-show="signup_form.email.$error.unique">
+            邮箱已经被占用
+        </small>
+    </td>
+</tr>

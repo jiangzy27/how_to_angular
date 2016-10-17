@@ -1,0 +1,15 @@
+<tr>
+    <th><span class="shall">*</span> 姓名</th>
+    <td class="form-group">
+        <input type="text"
+               name="name"
+               placeholder="请输入姓名"
+               ng-model="signup.name"
+               ng-minlength=6
+               ng-maxlength=20
+               required />
+        <small class="error small_error"   ng-show="signup_form.name.$error.required">姓名不可为空</small>
+        <small class="error small_error"   ng-show="signup_form.name.$error.minlength">不少于6个字符</small>
+        <small class="error small_error"   ng-show="signup_form.name.$error.maxlength">最多20个字符</small>
+    </td>
+</tr>

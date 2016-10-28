@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="UTF-8">
+    <title>select框的使用</title>
+    <script src="../../lib/angular.js"></script>
+</head>
+<body>
+<div ng-controller="myctrl">
+    <select ng-model="hello">
+        <option value="0">zero</option>
+        <option value="1">one</option>
+        <option value="2">two</option>
+    </select>
+
+    <h1>你选择的是: {{hello}}</h1>
+</div>
+</body>
+</html>
+<script>
+    var app = angular.module('app',[]);
+    app.controller('myctrl',function($scope){
+        $scope.hello = "0";//初始值
+
+    });
+</script>

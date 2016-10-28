@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html ng-app="myModule">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>表单验证</title>
+    <script src="http://mockjs.com/dist/mock-min.js"></script>
+    <link href="./bootstrap.min.css" rel="stylesheet">
+    <!--<link rel="stylesheet" href="./themes.css"/>-->
+    <script src="../../lib/jquery.js"></script>
+    <script src="../../lib/angular.js"></script>
+    <style>
+        .table-style12 {
+            border-top: none;
+            border-bottom: 1px solid #E8E8E8;
+        }
+        .vip-table { border-top: 1px solid #eaeaea; }
+        .vip-table h5 { margin-left: 15px; }
+        .vip-table thead th { padding: 5px 5px; border-right: none; }
+        .vip-table tbody th { padding: 15px 20px; border-right: 1px solid #eaeaea; width: 190px; }
+        .vip-table td, .vip-table th { border-top: 1px solid #eaeaea; text-align: left; background: #fff; }
+        .vip-table td { padding: 15px 20px; border-right: 1px solid #eaeaea; }
+        .vip-table.vborder-l td{border-left: 1px solid #eaeaea;}
+        .vip-table th { background: #fafafa; font-weight: normal; color: #666; }
+        .table-style12 { border-top: none; border-bottom: 1px solid #E8E8E8; }
+
+        .small_error{
+            color:#f00;
+            margin-left: 50px;
+            vertical-align: 3px;
+        }
+    </style>
+</head>
+<body ng-controller="formController">
+<div>
+    <div>
+        <form name="signup_form" novalidate ng-submit="signupForm()">
+            <table class="table vip-table table-style12">
+                <thead>
+                <tr>
+                    <th colspan="3"><h5>用户信息</h5></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th><span class="shall">*</span> 姓名</th>
+                    <td class="form-group">
+                        <input type="text"
+                               name="name"
+                               placeholder="请输入姓名"
+                               ng-model="signup.name"
+                               ng-minlength=6
+                               ng-maxlength=20
+                               required />
+                        <small class="error small_error"   ng-show="signup_form.name.$error.required">姓名不可为空</small>
+                        <small class="error small_error"   ng-show="signup_form.name.$error.minlength">不少于6个字符</small>
+                        <small class="error small_error"   ng-show="signup_form.name.$error.maxlength">最多20个字符</small>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="shall">*</span> 邮箱</th>
+                    <td class="form-group">
+                        <input type="text"
+                               placeholder="请输入邮箱"
+                               name="email"
+                               ng-model="signup.email"
+                               ng-pattern="/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/"
+                               ng-blur="ensureUnique(signup_form.email.$valid)"   required />
+                        <small class="small_error error"
+                               ng-show="signup_form.email.$error.required">
+                            邮箱不可为空
+                        </small>
+                        <small class="small_error error"
+                               ng-show="signup_form.email.$error.pattern">
+                            邮箱格式不正确
+                        </small>
+                        <small class="small_error error"
+                               ng-show="signup.unique">
+                            邮箱已经被占用
+                        </small>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <hr/>
+            <button type="submit" class="button radius">提交</button>
+
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
+<script>
+//忽视焦点时的远程验证
+/*有时候，我们使用指令方式的远程验证，会出现严重的性能问题，抬键验证让交互变得十分的繁琐。
+这时，我们可以撇掉原生的指令验证方式，改为忽视焦点的函数式自定义验证。
+*
+* */
+    //配置数据，随机生成真假数据，比例是1/2
+    Mock.mock('http://www.test.com/api/check/email', {
+        'isUnique|1': false
+
+
+    });
+
+
+    var app=angular.module('myModule',[]);
+    app.controller('formController', ['$scope','$http', function($scope,$http) {
+        //初始化文本框的值。
+        $scope.signup = {};
+        $scope.signup.name = 'aa';
+        $scope.signup.email = 'aaaaaa@qq.com';
+        //提交动作
+        $scope.signupForm = function() {
+            console.log($scope.signup_form.$valid);
+            if ($scope.signup_form.$valid) {
+                //如果验证都没有问题
+                alert('ok');
+            } else {
+                alert('no');
+            }
+        }
+
+        //自定义验证，在忽视焦点事件触发
+        $scope.ensureUnique = function(val){
+
+            //本地验证都通过之后
+            if(val){
+                $http({
+                    method: 'POST',
+                    url: 'http://www.test.com/api/check/email',
+                    data: {'email': $scope.signup.name}
+
+                }).success(function(data, status, headers, cfg) {
+                    console.log("email status:"+data.isUnique);
+                    //自定义状态
+                    $scope.signup.unique =  data.isUnique;
+
+
+                }).error(function(data, status, headers, cfg) {
+                    console.log('email wrong');
+                    $scope.signup.unique =  false;
+                });
+            }
+
+        }
+    }]);
+
+    //自定义验证：远程验证邮箱是否被占用
+//    app.directive('ensureUnique', ['$http', function($http) {
+//        return {
+//            require: 'ngModel',
+//            link: function(scope, ele, attrs, controller) {
+//                console.log(controller);
+//                scope.$watch(attrs.ngModel, function() {
+//                    $http({
+//                        method: 'POST',
+//                        url: 'http://www.test.com/api/check/email',
+//                        data: {'email': $(ele).val()}
+//
+//                    }).success(function(data, status, headers, cfg) {
+//                        console.log("email status:"+data.isUnique);
+//                        controller.$setValidity('unique', data.isUnique);
+//
+//
+//                    }).error(function(data, status, headers, cfg) {
+//                        console.log('email wrong');
+//                        controller.$setValidity('unique', false);
+//                    });
+//                });
+//            }
+//        }
+//    }]);
+
+</script>

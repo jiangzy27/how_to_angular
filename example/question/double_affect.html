@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>指令互相调用问题</title>
+    <script src="../../lib/angular.js"></script>
+</head>
+<body ng-controller="myCtrl">
+<dir1 val="val"></dir1>
+<dir2 val="val"></dir2>
+</body>
+</html>
+<script>
+
+    var app = angular.module("app",[]);
+
+    app.controller('myCtrl',function($scope,$timeout){
+        $scope.val = "";
+        $timeout(function(){
+            $scope.val = "haha";
+        },4000);
+
+    });
+    app.directive('dir1',function($timeout){
+        return {
+           scope:{val:'='},
+            link:function(scope,ele,attrs){
+                $timeout(function(){
+                    scope.val = "hello,world";
+                },3000);
+            }
+        };
+    });
+    app.directive('dir2',function($timeout){
+        return {
+            template:'<div>{{aa}}</div>',
+            replace:true,
+            restrict:'E',
+            scope:{val:'='},
+            link:function(scope,ele,attrs){
+                var bind_watch = scope.$watch("val",function(newValue,oldValue){
+                    if(newValue){
+                        scope.aa = scope.val;
+                        //bind_watch();//如果加上了这句话，父controller里面改变了val值，就不会改变指令里面的这个值了。
+                    }
+                });
+            }
+        };
+    });
+</script>

@@ -29,7 +29,7 @@
                 }).success(function(data){
                     $scope.arr[i-1]['name'] = data['cityName'];
                 });
-            })($scope.arr[i-1]['id']);
+            })(i);
 
         }
 

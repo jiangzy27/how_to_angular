@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>异步等待问题</title>
+    <script src="../../lib/angular.js"></script>
+</head>
+<body ng-controller="myCtrl">
+   <div test info="{{val}}"></div>
+</body>
+</html>
+<script>
+
+    var app = angular.module("app",[]);
+
+    app.controller('myCtrl',function($scope,$timeout){
+        $scope.val = '123';
+
+    });
+    app.directive('test',function($timeout){
+        return {
+            template:'<div>test value</div>',
+            restrict: 'A',
+            link:function(scope,ele,attrs){
+                console.log(attrs.info);
+            }
+        };
+    });
+</script>

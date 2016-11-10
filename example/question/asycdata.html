@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>空值问题</title>
+    <script src="../../lib/angular.js"></script>
+</head>
+<body ng-controller="myCtrl">
+    <ul>
+        <li ng-repeat="item in arr">
+            {{item['name']}}
+        </li>
+    </ul>
+</body>
+</html>
+<script>
+
+    var app = angular.module("app",[]);
+
+    app.controller('myCtrl',function($scope,$http){
+        $scope.arr = [{id:1},{id:2},{id:3},{id:4}];
+        for(var i=1;i<=$scope.arr.length;i++){
+            (function(i){
+                $http({
+                    url:'/getCity',
+                    method:'post',
+                    data:{cityId:i+""}
+
+                }).success(function(data){
+                    $scope.arr[i]['name'] = data['cityName'];
+                });
+            })(i);
+
+        }
+
+
+    });
+
+</script>

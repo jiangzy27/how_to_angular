@@ -2,8 +2,8 @@
 <html ng-app="app">
 <head lang="en">
     <meta charset="UTF-8">
-    <title>空值问题</title>
-    <script src="../../lib/angular.js"></script>
+    <title>异步赋值</title>
+    <script src="./angular.js"></script>
 </head>
 <body ng-controller="myCtrl">
     <ul>
@@ -27,9 +27,9 @@
                     data:{cityId:i+""}
 
                 }).success(function(data){
-                    $scope.arr[i]['name'] = data['cityName'];
+                    $scope.arr[i-1]['name'] = data['cityName'];
                 });
-            })(i);
+            })($scope.arr[i-1]['id']);
 
         }
 

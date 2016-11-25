@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>订阅-观察者模式</title>
     <script src="http://mockjs.com/dist/mock.js"></script>
-    
+
     <script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
 </head>
 <body>
@@ -19,7 +19,7 @@
     });
     //加上取消订阅的方法
     var event = {
-        eventList:[],
+        eventList:{},
         listen:function(key,fn){
             if(!this.eventList[key]){
                 this.eventList[key] = [];

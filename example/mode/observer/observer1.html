@@ -10,7 +10,7 @@
 </html>
 <script>
     var login = {};
-    login.eventList = [];
+    login.eventList = {};
     //将待处理的函数推入数组保存，待用
     login.listen = function(key,fn){
         if(!this.eventList[key]){

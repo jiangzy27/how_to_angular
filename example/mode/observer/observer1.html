@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>订阅-观察者模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    var login = {};
+    login.eventList = [];
+    //将待处理的函数推入数组保存，待用
+    login.listen = function(key,fn){
+        if(!this.eventList[key]){
+            this.eventList[key] = [];
+        }
+        this.eventList[key].push(fn);
+
+    };
+
+    login.trigger = function(key){
+
+        var fns = this.eventList[key];//拿到一组函数
+        if(!fns || fns.length === 0){
+           //没有要执行的函数，就返回
+            return false;
+        }
+        for(var i=0;i<fns.length;i++){
+            fns[i]();
+        }
+    }
+    //订阅
+    login.listen('loginSuccess',function(){
+        console.log('显示用户头像');
+    });
+    login.listen('loginSuccess',function(){
+        console.log('显示消息列表');
+    });
+
+    login.trigger('loginSuccess');
+
+</script>
+

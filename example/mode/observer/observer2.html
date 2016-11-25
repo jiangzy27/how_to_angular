@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>订阅-观察者模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    //不仅是登录模块有这样的订阅和发布的功能，事实上这个东西是个大家公用的功能才对。
+    var event = {
+        eventList:[],
+        listen:function(key,fn){
+            if(!this.eventList[key]){
+                this.eventList[key] = [];
+            }
+            this.eventList[key].push(fn);
+
+        },
+        //trigger('loginSucc',参数1,参数2)
+        trigger:function(){
+            //出列第一个数据：'loginSucc'
+            var key = Array.prototype.shift.call(arguments);
+            var fns = this.eventList[key];//拿到一组函数
+            if(!fns || fns.length === 0){
+                //没有要执行的函数，就返回
+                return false;
+            }
+            for(var i=0;i<fns.length;i++){
+                //arguments已经出列了一个数据，目前全是参数列表了
+                fns[i].apply(this,arguments);
+
+            }
+        }
+
+    };
+    //定义安装函数，可以给所有对象追加上订阅-发布的功能。
+    var installEvent = function(obj){
+        //浅拷贝
+        for(var i in event){
+            obj[i] = event[i];
+        }
+    }
+
+    var login = {};
+    installEvent(login);
+    //订阅
+    login.listen('loginSuccess',function(){
+        console.log('显示用户头像');
+    });
+    login.listen('loginSuccess',function(){
+        console.log('显示消息列表');
+    });
+
+    login.trigger('loginSuccess');
+
+</script>
+

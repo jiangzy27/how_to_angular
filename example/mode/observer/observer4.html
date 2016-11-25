@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>订阅-观察者模式</title>
+    <script src="http://mockjs.com/dist/mock.js"></script>
+    <script src="./jquery.min.js"></script>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    //这是一种非常优雅的解决ajax连环回调的问题
+    Mock.mock('http://ajax.login.com', {
+        'name'     : '@name',
+        'age|1-100': 1
+    });
+    //加上取消订阅的方法
+    var event = {
+        eventList:[],
+        listen:function(key,fn){
+            if(!this.eventList[key]){
+                this.eventList[key] = [];
+            }
+            this.eventList[key].push(fn);
+
+        },
+        remove:function(key,fn){
+            var fns = this.eventList[key];
+            if(!fns){
+                return false;
+            }
+            if(!fn){
+                //如果没有回调，表示取消此key下所有方法
+                fns && (fns.length=0);//这是一种快速清空数组的方法哦！
+            }else{
+                for(var i=0;i<fns.length;i++){
+                    //遍历方法列表,剔除需要取消的方法
+                    //要注意fns是引用型变量，实际是去除了this.eventList[key]下的方法。
+                    if(fns[i] == fn){
+                        fns.splice(i,1);
+                    }
+                }
+            }
+        },
+        //trigger('loginSucc',参数1,参数2)
+        trigger:function(){
+            //出列第一个数据：'loginSucc'
+            var key = Array.prototype.shift.call(arguments);
+            var fns = this.eventList[key];//拿到一组函数
+            if(!fns || fns.length === 0){
+                //没有要执行的函数，就返回
+                return false;
+            }
+            for(var i=0;i<fns.length;i++){
+                //arguments已经出列了一个数据，目前全是参数列表了
+                fns[i].apply(this,arguments);
+            }
+        }
+
+    };
+    //定义安装函数，可以给所有对象追加上订阅-发布的功能。
+    var installEvent = function(obj){
+        //浅拷贝
+        for(var i in event){
+            obj[i] = event[i];
+        }
+    }
+
+    var login = {};
+    installEvent(login);
+
+
+    //订阅
+    var avatar = (function(){
+        //订阅登录接口
+        login.listen('loginSucc',function(data){
+            avatar.setAvatar(data);
+        });
+        return {
+            setAvatar:function(data){
+                setTimeout(function(){
+                    console.log('显示用户'+data['name']+'的头像');
+                },2000);
+            }
+        };
+    })();
+    var Message = (function(){
+        //订阅登录接口
+        login.listen('loginSucc',function(data){
+            Message.setMsg(data);
+        });
+        return {
+            setMsg:function(data){
+                setTimeout(function(){
+                    console.log('显示用户'+data['name']+'的消息');
+                },1000);
+            }
+        };
+    })();
+    //发布
+    $.ajax({
+        url:'http://ajax.login.com',
+        dataType:'json',
+        success:function(data){
+            login.trigger('loginSucc',data);
+        }
+    });
+</script>
+

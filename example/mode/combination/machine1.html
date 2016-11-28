@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>组合模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+//组合对象
+    var CompositeForm = function(id){
+        this.formComponents = [];
+        this.formElement = document.createElement('form');
+        this.formElement.id = id;
+        this.formElement.onsubmit = function(){
+            return false;
+        }
+
+    }
+//组合对象特有的方法：添加元素
+    CompositeForm.prototype.add = function(child){
+        this.formComponents.push(child);
+    }
+//组合对象特有的方法
+    CompositeForm.prototype.loadElements = function(){
+        for(var i=0;i<this.formComponents.length;i++){
+            this.formElement.appendChild(this.formComponents[i].divElement);
+        }
+        var submitButton = document.createElement('input');
+        submitButton.id = "sub";
+        submitButton.type = "submit";
+        this.formElement.appendChild(submitButton);
+    }
+//迭代调用叶子对象的方法
+    CompositeForm.prototype.save = function(){
+        for(var i=0;i<this.formComponents.length;i++){
+            this.formComponents[i].save();
+        }
+    }
+//叶子对象
+    var  InputField = function(label,id,type){
+        /**动态创建节点**/
+        //创建input节点
+        this.input = document.createElement('input');
+        this.input.id = id;
+        this.input.type = type;
+        //创建文本节点
+        this.label = document.createElement('label');
+        var labelTextNode = document.createTextNode(label);
+        this.label.appendChild(labelTextNode);
+        //创建div节点
+        this.divElement = document.createElement('div');
+        //设置class
+        this.divElement.className = 'input-field';
+        //添加到div节点
+        this.divElement.appendChild(this.label);
+        this.divElement.appendChild(this.input);
+
+    }
+//保存自身的值
+    InputField.prototype.save = function(){
+        var value = this.input.value;
+        sessionStorage.setItem(this.id,value);
+        console.log(sessionStorage.getItem(this.id));
+    }
+    var form = new CompositeForm();
+//开始组合
+    form.add(new InputField('用户名','userName','text'));
+    form.add(new InputField('密码','passWd','password'));
+    form.add(new InputField('邮箱','email','text'));
+//装填所有节点
+    form.loadElements();
+//追加到dom
+    document.body.appendChild(form.formElement);
+//测试一下
+    document.getElementById('sub').onclick = function(){
+            form.save();
+    }
+
+</script>

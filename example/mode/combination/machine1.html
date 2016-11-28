@@ -62,10 +62,10 @@
 //保存自身的值
     InputField.prototype.save = function(){
         var value = this.input.value;
-        sessionStorage.setItem(this.id,value);
-        console.log(sessionStorage.getItem(this.id));
+        sessionStorage.setItem(this.input.id,value);
+        console.log(sessionStorage.getItem(this.input.id));
     }
-    var form = new CompositeForm();
+    var form = new CompositeForm('myform');
 //开始组合
     form.add(new InputField('用户名','userName','text'));
     form.add(new InputField('密码','passWd','password'));

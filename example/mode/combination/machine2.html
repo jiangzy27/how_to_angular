@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>继承模式</title>
+</head>
+<body>
+    <button onclick="sub()">提交</button>
+</body>
+</html>
+<script>
+
+//叶子对象的父类
+    var Field = function(id){
+        this.id = id;
+    };
+    Field.prototype.save = function(){
+        sessionStorage.setItem(this.id,this.getValue());
+        console.log(sessionStorage.getItem(this.id));
+    };
+//因select和textarea的方式取值方式跟input不一样
+//所以单独抽离获取值的方法
+//如果子类不覆盖此方法，save就会出错，所以用抛异常的方式，保证子类覆盖
+    Field.prototype.getValue = function(){
+        throw new Error("you should override this method");
+    };
+
+//叶子对象的子类InputField
+    var  InputField = function(label,id,type){
+ //继承父类的属性
+//相当于在InputField上加上了:this.id = id;
+//如果不继承属性，save方法调取this.id就会失败。
+        Field.call(this,id);
+        /**动态创建节点**/
+        //创建input节点
+        this.input = document.createElement('input');
+        this.input.id = id;
+        this.input.type = type;
+        //创建文本节点
+        this.label = document.createElement('label');
+        var labelTextNode = document.createTextNode(label);
+        this.label.appendChild(labelTextNode);
+        //创建div节点
+        this.divElement = document.createElement('div');
+        //设置class
+        this.divElement.className = 'input-field';
+        //添加到div节点
+        this.divElement.appendChild(this.label);
+        this.divElement.appendChild(this.input);
+
+    }
+//开始继承
+    function extend(newobj,obj){
+        var F = function(){};
+        F.prototype = obj.prototype;
+//新开辟一块空间，防止污染obj
+        newobj.prototype = new F();
+    }
+//先得到父类的prototype上的方法
+    extend(InputField,Field);
+//覆盖父类的方法,如果不覆盖,会抛异常
+    InputField.prototype.getValue = function(){
+        return this.input.value;
+    };
+//实验一下
+    var input = new InputField('用户名','userName','text');
+    document.body.appendChild(input.divElement);
+    function sub(){
+        input.save();
+    }
+</script>

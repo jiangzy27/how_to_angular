@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>组合+策略模式</title>
+</head>
+<body>
+</body>
+</html>
+<script>
+//继承方法
+function extend(newobj,obj){
+    var F = function(){};
+    F.prototype = obj.prototype;
+    newobj.prototype = new F();
+}
+
+//********叶子对象区************//
+var Field = function(id){
+    this.id = id;
+    this.divElement;
+};
+Field.prototype.save = function(){
+    sessionStorage.setItem(this.id,this.getValue());
+    console.log(sessionStorage.getItem(this.id));
+};
+//最终调用子对象的divElement，这个this指向必须是子对象。
+//用call函数可以修正this指向。
+//以供下面部件对象CompositeFieldSet中使用。
+Field.prototype.getDivElement = function(){
+//这里还要注意divElement必须有个id，在部件对象的容器中作为key值使用。
+    return this.divElement;
+};
+//子类继承使用
+Field.prototype.getValue = function(){
+    throw new Error("you should override this method");
+};
+
+var  InputField = function(label,id,type){
+    Field.call(this,id);
+    this.input = document.createElement('input');
+//策略验证类使用name寻找dom
+    this.input.name = id;
+    this.input.type = type;
+    this.label = document.createElement('label');
+    var labelTextNode = document.createTextNode(label);
+    this.label.appendChild(labelTextNode);
+    //创建div节点
+    this.divElement = document.createElement('div');
+    //设置id
+    this.divElement.id = id;
+    //设置class
+    this.divElement.className = 'input-field';
+    //添加到div节点
+    this.divElement.appendChild(this.label);
+    this.divElement.appendChild(this.input);
+
+};
+extend(InputField,Field);
+InputField.prototype.getValue = function(){
+    return this.input.value;
+};
+
+var SelectField = function(label,id,arr){
+    Field.call(this,id);
+    this.select = document.createElement('select');
+
+    for(var i=0;i<arr.length;i++){
+        var option = document.createElement('option');
+        option.text = arr[i]['text'];
+        option.value = arr[i]['value'];
+        this.select.options[i] = option;
+    }
+
+    this.label = document.createElement('label');
+    var labelTextNode = document.createTextNode(label);
+    this.label.appendChild(labelTextNode);
+    //创建div节点
+    this.divElement = document.createElement('div');
+    //设置id
+    this.divElement.id = id;
+    //设置class
+    this.divElement.className = 'select-field';
+    //添加到div节点
+    this.divElement.appendChild(this.label);
+    this.divElement.appendChild(this.select);
+}
+
+extend(SelectField,Field);
+SelectField.prototype.getValue = function(){
+    return this.select.options[this.select.selectedIndex].value;
+};
+//********部件对象区************//
+//部件对象：可以按照业务分组表单元素
+var CompositeFieldSet = function(id,legendText){
+//注意这里不是数组了。
+    this.components={};
+//legend和fieldset元素在表单元素分组很常用
+//一个fieldset包含许多legend
+    this.element=document.createElement('fieldset');
+    this.element.id = id;
+//dom分组
+    if(legendText){
+        this.legend=document.createElement('legend');
+        this.legend.appendChild(document.createTextNode(legendText));
+        this.element.appendChild(this.legend);
+    }
+
+};
+CompositeFieldSet.prototype.add = function(child){
+//容器内的元素按照id分组。
+//每个child是一个叶子对象。
+    this.components[child.getDivElement().id]=child;
+    this.element.appendChild(child.getDivElement());
+};
+//获取这个部件对象，以供下面CompositeForm对象中使用。
+CompositeFieldSet.prototype.getElement = function(){
+    return this.element;
+};
+CompositeFieldSet.prototype.save = function(){
+    //debugger;
+    console.log(this.components);
+    for(var id in this.components){
+        //如果容器没有这个元素，直接跳过。
+        if(!this.components.hasOwnProperty(id)){
+            continue;
+        }
+        this.components[id].save();
+    }
+};
+//********form整体区************//
+var CompositeForm = function(id){
+    this.formComponents = [];
+    this.formElement = document.createElement('form');
+    this.formElement.id = id;
+    this.formElement.onsubmit = function(){
+        return false;
+    }
+}
+CompositeForm.prototype.add = function(child){
+    this.formComponents.push(child);
+//添加部件元素
+//每个child是一个部件对象。
+    this.formElement.appendChild(child.getElement());
+};
+
+CompositeForm.prototype.save = function(){
+    for(var i=0;i<this.formComponents.length;i++){
+        this.formComponents[i].save();
+    }
+};
+//获取最终form对象，以供追加到body下。
+CompositeForm.prototype.getFinalElement = function(){
+    var submitButton = document.createElement('input');
+    submitButton.id = "sub";
+    submitButton.type = "submit";
+    this.formElement.appendChild(submitButton);
+    return this.formElement;
+};
+//********开始组合************//
+var form = new CompositeForm('contact-form');
+//造部件:名字分组
+var nameFieldSet = new CompositeFieldSet('name-fieldset','nameArea');
+nameFieldSet.add(new InputField('first-name','firstName','text'));
+nameFieldSet.add(new InputField('last-name','lastName','text'));
+console.log(nameFieldSet);
+//造部件：地址分组
+var addressFieldSet = new CompositeFieldSet('address-fieldset','addressArea');
+addressFieldSet.add(new SelectField('国家','country',[{text:'美国',value:'us'},{text:'日本',value:'jp'}]));
+addressFieldSet.add(new InputField('地址','detail','text'));
+addressFieldSet.add(new InputField('手机号','phone','text'));
+
+form.add(nameFieldSet);
+form.add(addressFieldSet);
+var formNode = form.getFinalElement();
+document.body.appendChild(formNode);
+//****策略类******************//
+//策略类跟组合类没有任何耦合，可以将其封装起来
+var strategies = {
+    isNonEmpty:function(value,errorMsg){
+        if(value==""){
+            return errorMsg;
+        }
+    },
+    minLength:function(value,length,errorMsg){
+        if(value.length<length){
+            return errorMsg;
+        }
+    },
+    isMobile:function(value,errorMsg){
+        if(!/^1[3|5|8][0-9]{9}$/.test(value)){
+            return errorMsg;
+        }
+    }
+};
+var Validator = function(){
+    this.cache = [];
+};
+Validator.prototype.add = function(dom,rules){
+    var self = this;
+    //遍历策略数组
+    for(var i=0;i<rules.length;i++){
+        (function(rule){
+            var arr = rule.strategy.split(":");
+            var errorMsg = rule.errorMsg;
+            //将函数都压入数组
+            self.cache.push(function(){
+                //拿出策略字串备用
+                var strategy = arr.shift();
+                //将dom值放在数组头一个
+                arr.unshift(dom.value);
+                //报错信息放在数组最后一个
+                arr.push(errorMsg);
+                return strategies[strategy].apply(dom,arr);
+            });
+        })(rules[i]);
+    }
+
+};
+Validator.prototype.start = function(){
+    for(var i=0;i<this.cache.length;i++){
+        var msg = this.cache[i]();
+        if(msg)
+            return msg;
+    }
+};
+//初始化验证类
+var validator = new Validator();
+//验证字段：将组合类中的字段一一绑定策略
+var todoFunc = function(){
+    var validator = new Validator();
+//*****添加校验规则******//
+    validator.add(formNode.firstName,[
+        {strategy:'isNonEmpty',errorMsg:'firstName能为空'},
+        {strategy:'minLength:5',errorMsg:'firstName长度不能少于5位'}
+
+    ]);
+    validator.add(formNode.lastName,[
+        {strategy:'isNonEmpty',errorMsg:'lastName不能为空'},
+        {strategy:'minLength:3',errorMsg:'lastName长度不能少于3位'}
+
+    ]);
+    validator.add(formNode.detail,[
+        {strategy:'isNonEmpty',errorMsg:'地址不能为空'},
+        {strategy:'minLength:10',errorMsg:'地址长度不能少于10位'}
+
+    ]);
+    validator.add(formNode.phone,[
+        {strategy:'isNonEmpty',errorMsg:'手机号不能为空'},
+        {strategy:'isMobile',errorMsg:'手机号码格式不正确'}
+
+    ]);
+    //收集报错信息
+    var errorMsg = validator.start();
+    return errorMsg;
+
+};
+//********试验一下************//
+document.getElementById('sub').onclick = function(){
+    //保存值
+    form.save();
+    //开始验证
+    var errorMsg = todoFunc();
+    if(errorMsg){
+        alert(errorMsg);
+    }
+    return false;
+}
+</script>

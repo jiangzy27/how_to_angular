@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>中间变量法</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    var a = function(){
+        console.log('修饰前');
+    };
+    //用中间变量暂存原函数
+    var _a = a;
+    //给原函数赋予新功能
+    a = function(){
+        console.log('加入新功能');
+        _a();
+    }
+//window.onload例子
+    window.onload = function(){
+        console.log('onload修饰前');
+    };
+    //中间变量暂存原函数
+    var _onload = window.onload;
+    window.onload = function(){
+        _onload();
+        console.log('onload加入新功能');
+    }
+</script>

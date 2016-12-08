@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>装饰模式-ajax拦截器</title>
+    <script src="http://mockjs.com/dist/mock.js"></script>
+</head>
+<body>
+    <button id="btn">click</button>
+</body>
+</html>
+<script>
+    Function.prototype.before = function(beforeFn){
+        var self = this;
+        return function(){
+            beforeFn.apply(this,arguments);
+            return self.apply(this,arguments);
+        }
+    };
+//*****封装一个ajax***************//
+    Mock.mock('http://hello.com', {
+        'name'     : '@name',
+        'age|1-100': 100,
+        'color'    : '@color'
+    });
+    function myAjax(obj){
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = callback;
+        xhr.open('GET',obj.url);
+        console.log(obj.data);
+        xhr.send(obj.data);
+        //内部函数
+        function callback(){
+            if(xhr.readyState == 4){
+                if(xhr.status ==200){
+                    console.log(xhr.responseText);//http状态码对应的文本
+                }
+
+            }
+        }
+    }
+//测试一下ajax拦截器
+    myAjax = myAjax.before(function(){
+        //改变参数值
+        arguments[0]['data'] = arguments[0]['data']+'&pass=123';
+    });
+    myAjax({url:'http://hello.com',data:'username=zhangsan'});
+
+</script>

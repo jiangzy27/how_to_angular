@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>中间变量法</title>
+</head>
+<body>
+    <button id="btn">click</button>
+</body>
+</html>
+<script>
+    //中间变量暂存原函数
+    var _getEle = document.getElementById;
+    //给document.getElementById赋予新功能
+    document.getElementById = function(id){
+        console.log('新功能');
+        return _getEle(id);//(1)
+
+    };
+//测试
+    var button = document.getElementById('btn');
+    button.onclick = function(){
+        console.log('test');
+    }
+</script>

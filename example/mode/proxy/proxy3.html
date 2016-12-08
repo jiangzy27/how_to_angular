@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>代理模式</title>
+</head>
+<body>
+</body>
+</html>
+<script>
+var myImage = (function(){
+    var imgNode = document.createElement('img');
+    document.body.appendChild(imgNode);
+    return {
+        setSrc:function(src){
+            imgNode.src=src;
+        }
+    };
+})();
+var proxyImage = (function(){
+    var img = new Image();
+    //Image图片对象不同于图片的dom节点，莫混淆。
+    img.onload = function(){
+        //可以在这里打个断点
+        debugger;
+        //this表示Image图片对象,src是图片对象的自有属性
+        myImage.setSrc(this.src);
+    };
+    return {
+        setSrc:function(src){
+            //控制dom的image
+            myImage.setSrc('https://raw.githubusercontent.com/jiangzy27/how_to_react/master/image/loading.gif');
+            //控制Image对象
+            img.src = src;
+        }
+    };
+})();
+/**执行顺序:
+ * 1.dom节点先显示loading图片
+ * 2.img.src=src执行时，会触发img.onload,
+ * 3.重新设置dom节点的src图片。
+ *
+ */
+proxyImage.setSrc('https://raw.githubusercontent.com/jiangzy27/how_to_react/master/image/sample.jpg');
+</script>

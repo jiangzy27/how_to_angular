@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>单例模式</title>
+    <style>
+    .hint{ padding: 10px 20px;
+            background: #FF704B;
+            text-align: center;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            border-radius: 3px;
+            color: #fff;
+            -webkit-animation: 0.5s shake;
+            z-index:9999;
+    }
+    </style>
+
+</head>
+<body>
+    <button onclick="sub()">小小提示语</button>
+</body>
+</html>
+<script>
+//提示框属于典型的单例模式，因为大家公用一个对象即可。
+    var CreateHint = (function(){
+        //这是个静态变量
+        var instance;
+        //测试静态变量，下面我无论实例化多少遍，但只打印一次
+        console.log(instance);
+        //初始化即调用。
+        var CreateHint = function(content){
+            if(instance){
+                instance.show(content);
+                return instance;
+            }
+            //初次实例化
+            this.content = content;
+            this.div;
+            this.init();
+            //将单例对象指向this
+            instance = this;
+            return instance;
+        };
+        //创建dom
+        CreateHint.prototype.init = function(){
+            this.div = document.createElement('div');
+            this.div.className = 'hint';
+            this.div.innerHTML = this.content;
+            document.body.appendChild(this.div);
+
+        };
+        CreateHint.prototype.show = function(content){
+            //修正提示语
+            this.div.innerHTML = content;
+            this.div.style.display = 'block';
+            var that = this;
+            setTimeout(function(){
+                that.div.style.display = 'none';
+            },2000);
+        };
+        return CreateHint;
+    })();
+//测试
+    var a = new CreateHint('hello,ketty');
+    var b = new CreateHint('hello world');
+    console.log(a===b);
+//按钮点击效果
+    function sub(){
+        var c = new CreateHint('this is a test');
+        //测试：都是同一个单例对象。
+        console.log(a==c);
+        console.log(b==c);
+    }
+</script>

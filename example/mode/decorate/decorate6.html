@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>装饰模式</title>
+</head>
+<body>
+    <button id="btn">click</button>
+</body>
+</html>
+<script>
+    //修饰前
+    //先执行新函数，然后执行原函数
+    Function.prototype.before = function(beforeFn){
+        var self = this;//保存原函数的引用
+        console.log(this);//指向 function getElementById() { [native code] }
+        return function(){//返回包含原函数和新函数的杂烩函数
+            console.log(this);//指向document
+            beforeFn.apply(this,arguments);//执行新函数
+            return self.apply(this,arguments);//执行原函数，注意其this修正为指向document
+        }
+    };
+    //修饰后
+    //先执行原函数，再执行新函数
+    Function.prototype.after = function(afterFn){
+      var self = this;
+      return function(){
+          var res = self.apply(this,arguments);//使用中间变量暂存结果，这里不能直接返回哦~~
+          afterFn.apply(this,arguments);
+          return res;
+      }
+    };
+//测试一下
+    document.getElementById = document.getElementById.before(function(){
+        console.log('修饰前');
+    });
+    document.getElementById = document.getElementById.after(function(){
+        console.log('修饰后');
+    });
+    var button = document.getElementById('btn');
+    button.onclick = function(){
+        console.log('test');
+    }
+</script>

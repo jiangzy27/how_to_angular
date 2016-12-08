@@ -8,13 +8,62 @@
 </body>
 </html>
 <script>
+//****策略类******************//
+//策略类跟组合类没有任何耦合，可以将其封装起来
+var strategies = {
+    isNonEmpty:function(value,errorMsg){
+        if(value==""){
+            return errorMsg;
+        }
+    },
+    minLength:function(value,length,errorMsg){
+        if(value.length<length){
+            return errorMsg;
+        }
+    },
+    isMobile:function(value,errorMsg){
+        if(!/^1[3|5|8][0-9]{9}$/.test(value)){
+            return errorMsg;
+        }
+    }
+};
+var Validator = function(){
+    this.cache = [];
+};
+Validator.prototype.add = function(dom,rules){
+    var self = this;
+    //遍历策略数组
+    for(var i=0;i<rules.length;i++){
+        (function(rule){
+            var arr = rule.strategy.split(":");
+            var errorMsg = rule.errorMsg;
+            //将函数都压入数组
+            self.cache.push(function(){
+                //拿出策略字串备用
+                var strategy = arr.shift();
+                //将dom值放在数组头一个
+                arr.unshift(dom.value);
+                //报错信息放在数组最后一个
+                arr.push(errorMsg);
+                return strategies[strategy].apply(dom,arr);
+            });
+        })(rules[i]);
+    }
+
+};
+Validator.prototype.start = function(){
+    for(var i=0;i<this.cache.length;i++){
+        var msg = this.cache[i]();
+        if(msg)
+            return msg;
+    }
+};
 //继承方法
 function extend(newobj,obj){
     var F = function(){};
     F.prototype = obj.prototype;
     newobj.prototype = new F();
 }
-
 //********叶子对象区************//
 var Field = function(id){
     this.id = id;
@@ -97,6 +146,7 @@ var CompositeFieldSet = function(id,legendText){
     this.components={};
 //legend和fieldset元素在表单元素分组很常用
 //一个fieldset包含许多legend
+    this.id = id;
     this.element=document.createElement('fieldset');
     this.element.id = id;
 //dom分组
@@ -128,6 +178,21 @@ CompositeFieldSet.prototype.save = function(){
         this.components[id].save();
     }
 };
+//拆卸某个叶子对象
+//这样就不用去寻找添加元素的地方注释代码。
+CompositeFieldSet.prototype.remove=function(id){
+//根据id找到child节点
+    var child;
+  for(var key in this.components){
+      if(this.components[key]['id'] === id){
+          child = this.components[key];
+          delete this.components[child.getDivElement().id];
+          this.element.removeChild(child.getDivElement());
+          break;
+      }
+  }
+
+};
 //********form整体区************//
 var CompositeForm = function(id){
     this.formComponents = [];
@@ -147,6 +212,18 @@ CompositeForm.prototype.add = function(child){
 CompositeForm.prototype.save = function(){
     for(var i=0;i<this.formComponents.length;i++){
         this.formComponents[i].save();
+    }
+};
+//拆掉某个元素
+CompositeForm.prototype.remove = function(id){
+    var child;
+    for(var i=0;i<this.formComponents.length;i++){
+        if(this.formComponents[i].id===id){
+            child=this.formComponents[i];
+            this.formComponents.splice(i,1);
+            this.formElement.removeChild(child.getElement());
+            break;
+        }
     }
 };
 //获取最终form对象，以供追加到body下。
@@ -169,61 +246,25 @@ var addressFieldSet = new CompositeFieldSet('address-fieldset','addressArea');
 addressFieldSet.add(new SelectField('国家','country',[{text:'美国',value:'us'},{text:'日本',value:'jp'}]));
 addressFieldSet.add(new InputField('地址','detail','text'));
 addressFieldSet.add(new InputField('手机号','phone','text'));
+//造部件：测试分组
+var testFieldSet = new CompositeFieldSet('test-fieldset','testArea');
+testFieldSet.add(new InputField('测试','test','text'));
 
 form.add(nameFieldSet);
 form.add(addressFieldSet);
+form.add(testFieldSet);
+
+//突然有一天，经理让你去掉测试分组，
+//并且去掉地址分组中的国家元素。
+//但是我并不想去找add的代码到底在哪里
+//于是可以从控制台中直接找到id的相关信息，用remove删除就好
+addressFieldSet.remove('country');
+form.remove('test-fieldset');
+
+console.log(form);
 var formNode = form.getFinalElement();
 document.body.appendChild(formNode);
-//****策略类******************//
-//策略类跟组合类没有任何耦合，可以将其封装起来
-var strategies = {
-    isNonEmpty:function(value,errorMsg){
-        if(value==""){
-            return errorMsg;
-        }
-    },
-    minLength:function(value,length,errorMsg){
-        if(value.length<length){
-            return errorMsg;
-        }
-    },
-    isMobile:function(value,errorMsg){
-        if(!/^1[3|5|8][0-9]{9}$/.test(value)){
-            return errorMsg;
-        }
-    }
-};
-var Validator = function(){
-    this.cache = [];
-};
-Validator.prototype.add = function(dom,rules){
-    var self = this;
-    //遍历策略数组
-    for(var i=0;i<rules.length;i++){
-        (function(rule){
-            var arr = rule.strategy.split(":");
-            var errorMsg = rule.errorMsg;
-            //将函数都压入数组
-            self.cache.push(function(){
-                //拿出策略字串备用
-                var strategy = arr.shift();
-                //将dom值放在数组头一个
-                arr.unshift(dom.value);
-                //报错信息放在数组最后一个
-                arr.push(errorMsg);
-                return strategies[strategy].apply(dom,arr);
-            });
-        })(rules[i]);
-    }
 
-};
-Validator.prototype.start = function(){
-    for(var i=0;i<this.cache.length;i++){
-        var msg = this.cache[i]();
-        if(msg)
-            return msg;
-    }
-};
 //初始化验证类
 var validator = new Validator();
 //验证字段：将组合类中的字段一一绑定策略

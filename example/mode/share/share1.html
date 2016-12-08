@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>享元模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+//雇佣模特
+var  HireModel = function(sex,clothes){
+    //内部状态是性别
+    this.sex = sex;
+    this.clothes = clothes;
+};
+
+HireModel.prototype.wearClothes = function(){
+    var div = document.createElement('div');
+    var str = this.sex+"穿了"+this.clothes;
+    var text = document.createTextNode(str);
+    div.appendChild(text);
+    document.body.appendChild(div);
+};
+/*******通过运行时间测试性能**********/
+var start = new Date().getTime();//起始时间
+for(var i=0;i<50000;i++){
+    var model  = new HireModel('male','第'+i+'款');
+    model.wearClothes();
+
+}
+var end = new Date().getTime();//结束时间
+console.log(end-start);
+</script>

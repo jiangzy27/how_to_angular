@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>代理模式</title>
+    <style>
+    .hint{ padding: 10px 20px;
+            background: #FF704B;
+            text-align: center;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            border-radius: 3px;
+            color: #fff;
+            -webkit-animation: 0.5s shake;
+            z-index:9999;
+    }
+
+    </style>
+
+</head>
+<body>
+    <button onclick="sub()">代理模式的提示</button>
+</body>
+</html>
+<script>
+//变成普通类
+var CreateHint = function(content) {
+    this.content = content;
+    this.init();
+};
+//初始化，创建dom
+CreateHint.prototype.init = function(){
+    this.div = document.createElement('div');
+    this.div.className = 'hint';
+    this.div.innerHTML = this.content;
+    document.body.appendChild(this.div);
+
+};
+CreateHint.prototype.show = function(content){
+    //修正提示语
+    this.div.innerHTML = content;
+    this.div.style.display = 'block';
+    var that = this;
+    setTimeout(function(){
+        that.div.style.display = 'none';
+    },2000);
+};
+//代理类,用来创建单例，减少耦合。
+var Proxy = (function(){
+    var instance;//静态变量
+    return function(content){
+        if(!instance){
+            instance = new CreateHint(content);
+        }
+        instance.show(content);
+        return instance;
+    }
+})();
+//测试
+var a = new Proxy('hello,ketty');
+var b = new Proxy('hello world');
+console.log(a===b);
+//按钮点击效果
+function sub(){
+    var c = new Proxy('this is a test');
+    //测试：都是同一个单例对象。
+    console.log(a==c);
+    console.log(b==c);
+}
+</script>

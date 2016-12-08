@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>享元模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+//雇佣模特
+var  HireModel = function(sex){
+    //内部状态是性别
+    this.sex = sex;
+};
+HireModel.prototype.wearClothes = function(clothes){
+    var div = document.createElement('div');
+    var str = this.sex+"穿了"+clothes;
+    var text = document.createTextNode(str);
+    div.appendChild(text);
+    document.body.appendChild(div);
+};
+//工厂模式，负责造出男女两个模特
+var ModelFactory = (function(){
+    var cacheObj = {};
+    return {
+        create:function(sex){
+            //根据uploadType分组
+            if(cacheObj[sex]){
+                return cacheObj[sex];
+            }else{
+                cacheObj[sex] = new HireModel(sex);
+                return cacheObj[sex];
+            }
+        }
+    };
+})();
+
+//模特管理，负责对应一个模特穿多种衣服
+var ModelManager = (function(){
+//容器存储：1.共享对象 2.外部状态
+    var vessel = {};
+    return {
+        add:function(sex,clothes,id){
+            //造出共享元素:模特
+            var model = ModelFactory.create(sex);
+            //以id为键存储所有状态
+            vessel[id] = {
+                model:model,
+                clothes:clothes
+            };
+        },
+        wear:function(){
+            for(var key in vessel){
+                //调用雇佣模特类中的穿衣服方法。
+                vessel[key]['model'].wearClothes(vessel[key]['clothes']);
+            }
+        }
+    };
+})();
+
+/*******通过运行时间测试性能**********/
+var start = new Date().getTime();//起始时间
+for(var i=0;i<50000;i++){
+    ModelManager.add('male','第'+i+'款',i);
+}
+var end = new Date().getTime();//结束时间
+console.log(end-start);
+ModelManager.wear();
+</script>

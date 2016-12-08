@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>享元模式-对象池</title>
+</head>
+<body>
+<button onclick="firstSearch()">第一次搜索</button>
+<button onclick="recoverTip()">回收气泡</button>
+<button onclick="secondSearch()">第二次搜索</button>
+</body>
+</html>
+<script>
+    var domFactory = (function(){
+        var pool = [];
+        return {
+            create:function(){
+                if(pool.length == 0){
+                    var div = document.createElement('div');
+                    document.body.appendChild(div);
+                    return div;
+                }else{
+                    //从对象池取出一个dom
+                    return pool.shift();
+                }
+            },
+            recover:function(dom){
+                //将dom推入对象池
+                pool.push(dom);
+            }
+        };
+    })();
+
+    var arr = [];
+    //第一次搜索的两个气泡
+    function firstSearch(){
+        var tipArr = ['A','B'];
+        for(var i=0;i<tipArr.length;i++){
+            var tip = domFactory.create();
+            tip.innerHTML = tipArr[i];
+            document.body.appendChild(tip);
+            arr.push(tip);
+        }
+    }
+
+//把搜索过的dom节点回收到对象池
+    function recoverTip(){
+        for(var i=0;i<arr.length;i++){
+            domFactory.recover(arr[i]);
+        }
+    }
+//第二次搜索的5个气泡
+    function secondSearch(){
+        var tipArr2 = ['A','B','C','D','E'];
+        for(var i=0;i<tipArr2.length;i++){
+            var newtip = domFactory.create();
+            newtip.innerHTML = tipArr2[i];
+            document.body.appendChild(newtip);
+        }
+    }
+
+</script>

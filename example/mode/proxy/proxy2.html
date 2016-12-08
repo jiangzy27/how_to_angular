@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>无模式图片加载</title>
+</head>
+<body>
+</body>
+</html>
+<script>
+var myImage = (function(){
+    var imgNode = document.createElement('img');
+    document.body.appendChild(imgNode);
+    var img = new Image();
+    //Image图片对象不同于图片的dom节点，莫混淆。
+    img.onload = function(){
+        //替换dom节点的src值
+        imgNode.src=img.src;
+    };
+    return {
+        setSrc:function(src){
+            //先加载dom节点
+            imgNode.src = 'https://raw.githubusercontent.com/jiangzy27/how_to_react/master/image/loading.gif';
+            //这里会触发onload事件
+            img.src=src;
+        }
+    };
+})();
+myImage.setSrc('https://raw.githubusercontent.com/jiangzy27/how_to_react/master/image/sample.jpg');
+</script>

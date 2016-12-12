@@ -110,7 +110,7 @@
     //传递请求
     Chain.prototype.passRequest = function(){
         //debugger;//(2)
-        var res = this.fn.apply(this,arguments);//执行函数，将this作用域置换为Chain类
+        var res = this.fn.apply(this,arguments);//执行函数，将this作用域置换为Chain对象
         if(res ==='nextSuccessor'){
             return (this.successor && this.successor.passRequest.apply(this.successor,arguments));
         }
@@ -126,7 +126,7 @@
     var chainMortgage = new Chain(checkMortgage);
     var chainPersonal = new Chain(checkPersonal);
     //debugger;//(1)
-    //链式调用，只要保证this指向始终是Chain的实例。
+    //链式调用，只要保证this指向始终是Chain对象。
     chainBasic.setNextSuccessor(chainMortgage).setNextSuccessor(chainPersonal);
 
     //测试一下

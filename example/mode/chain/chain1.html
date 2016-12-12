@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>层层验证-无模式</title>
+</head>
+<body>
+<form onsubmit="return false;">
+    <fieldset>
+        <legend>基本信息</legend>
+        <div>
+            <label>姓名</label>
+            <input id="userName" type="text">
+        </div>
+        <div>
+            <label>生日</label>
+            <input id="birthday" type="text">
+        </div>
+        <div>
+            <label>家庭住址</label>
+            <input id="address" type="text">
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>抵押信息</legend>
+        <div>
+            <label>房产</label>
+            <input id="house" type="text"></div>
+        <div>
+            <label>车子</label>
+            <input id="car" type="text">
+        </div>
+        <div>
+            <label>票子</label>
+            <input id="money" type="text">
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>隐私信息</legend>
+        <div>
+            <label>身份证号</label>
+            <input id="identity" type="text"></div>
+        <div>
+            <label>手机号</label>
+            <input id="phone" type="text">
+        </div>
+        <div>
+            <label>银行卡号</label>
+            <input id="bankNo" type="text">
+        </div>
+    </fieldset>
+    <input id="sub" type="submit">
+</form>
+</body>
+</html>
+<script>
+    var btn = document.getElementById('sub');
+    btn.onclick = function(){
+        var userName = document.getElementById('userName').value;
+        var birthday = document.getElementById('birthday').value;
+        var address = document.getElementById('address').value;
+        if(userName && birthday && address){
+            console.log('基本信息通过');
+            //开始验证担保信息
+            var house = document.getElementById('house').value;
+            var car = document.getElementById('car').value;
+            var money = document.getElementById('money').value;
+            if(house && car && money){
+                console.log('抵押信息通过');
+                //开始验证隐私信息
+                var identity = document.getElementById('identity').value;
+                var phone = document.getElementById('phone').value;
+                var bankNo = document.getElementById('bankNo').value;
+                if(identity && phone && bankNo){
+                    console.log('ok全通过了');
+                    return true;
+                }else{
+                    console.log('隐私信息有误');
+                    return false;
+                }
+            }else{
+                console.log('抵押信息有误');
+                return false;
+            }
+
+        }else{
+            console.log('基本信息有误');
+            return false;
+        }
+    };
+</script>

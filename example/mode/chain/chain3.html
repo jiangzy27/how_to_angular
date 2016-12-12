@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>职责链验证</title>
+</head>
+<body>
+<form onsubmit="return false;">
+    <fieldset>
+        <legend>基本信息</legend>
+        <div>
+            <label>姓名</label>
+            <input id="userName" type="text">
+        </div>
+        <div>
+            <label>生日</label>
+            <input id="birthday" type="text">
+        </div>
+        <div>
+            <label>家庭住址</label>
+            <input id="address" type="text">
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>抵押信息</legend>
+        <div>
+            <label>房产</label>
+            <input id="house" type="text"></div>
+        <div>
+            <label>车子</label>
+            <input id="car" type="text">
+        </div>
+        <div>
+            <label>票子</label>
+            <input id="money" type="text">
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>隐私信息</legend>
+        <div>
+            <label>身份证号</label>
+            <input id="identity" type="text"></div>
+        <div>
+            <label>手机号</label>
+            <input id="phone" type="text">
+        </div>
+        <div>
+            <label>银行卡号</label>
+            <input id="bankNo" type="text">
+        </div>
+    </fieldset>
+    <input id="sub" type="submit">
+</form>
+</body>
+</html>
+<script>
+//如果基本信息验证通过，交给下一层处理
+    function checkBasic(){
+        var userName = document.getElementById('userName').value;
+        var birthday = document.getElementById('birthday').value;
+        var address = document.getElementById('address').value;
+        if(userName && birthday && address){
+            return checkMortgage();
+        }else{
+            return false;
+        }
+    }
+    function checkMortgage(){
+        var house = document.getElementById('house').value;
+        var car = document.getElementById('car').value;
+        var money = document.getElementById('money').value;
+        if(house && car && money){
+            return checkPersonal();
+        }else{
+            return false;
+        }
+    }
+    function checkPersonal(){
+        var identity = document.getElementById('identity').value;
+        var phone = document.getElementById('phone').value;
+        var bankNo = document.getElementById('bankNo').value;
+        if(identity && phone && bankNo){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    var btn = document.getElementById('sub');
+    btn.onclick = function(){
+        if(checkBasic()){
+            console.log('ok全通过了');
+        }else{
+            console.log('信息有误');
+        }
+    };
+</script>

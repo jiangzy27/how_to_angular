@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>异步职责链验证</title>
+</head>
+<body>
+<form onsubmit="return false;">
+    <fieldset>
+        <legend>基本信息</legend>
+        <div>
+            <label>姓名</label>
+            <input id="userName" type="text">
+        </div>
+        <div>
+            <label>生日</label>
+            <input id="birthday" type="text">
+        </div>
+        <div>
+            <label>家庭住址</label>
+            <input id="address" type="text">
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>抵押信息</legend>
+        <div>
+            <label>房产</label>
+            <input id="house" type="text"></div>
+        <div>
+            <label>车子</label>
+            <input id="car" type="text">
+        </div>
+        <div>
+            <label>票子</label>
+            <input id="money" type="text">
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>隐私信息</legend>
+        <div>
+            <label>身份证号</label>
+            <input id="identity" type="text"></div>
+        <div>
+            <label>手机号</label>
+            <input id="phone" type="text">
+        </div>
+        <div>
+            <label>银行卡号</label>
+            <input id="bankNo" type="text">
+        </div>
+    </fieldset>
+    <input id="sub" type="submit">
+</form>
+</body>
+</html>
+<script>
+    //减少耦合，砸烂链条
+    function checkBasic(){
+        var userName = document.getElementById('userName').value;
+        var birthday = document.getElementById('birthday').value;
+        var address = document.getElementById('address').value;
+        if(userName && birthday && address){
+            return 'nextSuccessor';//并不知道下一个节点是谁，只是请求传递
+        }else{
+            console.log('基本信息有误');
+            return false;
+        }
+    }
+    //验证是异步的
+    function checkMortgage(){
+        var house = document.getElementById('house').value;
+        var car = document.getElementById('car').value;
+        var money = document.getElementById('money').value;
+        var self = this;//this会在下面执行时发生作用域置换
+        setTimeout(function(){
+            if(house && car && money){
+                //return 'nextSuccessor';//直接返回标志位是无意义的
+                self.next();
+            }else{
+                console.log('抵押信息有误');
+                return false;
+            }
+        },1000);
+
+    }
+    function checkPersonal(){
+        var identity = document.getElementById('identity').value;
+        var phone = document.getElementById('phone').value;
+        var bankNo = document.getElementById('bankNo').value;
+        if(identity && phone && bankNo){
+            console.log('ok，全部通过');
+            return true;
+        }else{
+            console.log('隐私信息有误');
+            return false;
+        }
+    }
+    //**************职责链*****************//
+    var Chain = function(fn){
+        this.fn = fn;
+        this.successor = null;
+    };
+    //设置职责链
+    Chain.prototype.setNextSuccessor = function(successor){
+        //debugger;//(1)
+        console.log(this);
+        this.successor = successor;
+        return this.successor;
+    };
+    //传递请求
+    Chain.prototype.passRequest = function(){
+        //debugger;//(2)
+        var res = this.fn.apply(this,arguments);//执行函数，将this作用域置换为Chain类
+        if(res ==='nextSuccessor'){
+            return (this.successor && this.successor.passRequest.apply(this.successor,arguments));
+        }
+        return res;
+    };
+    //手动传递请求
+    Chain.prototype.next = function(){
+        //debugger;//(2)
+        return (this.successor && this.successor.passRequest.apply(this.successor,arguments));
+    };
+    //************使用职责链*************//
+    var chainBasic = new Chain(checkBasic);
+    var chainMortgage = new Chain(checkMortgage);
+    var chainPersonal = new Chain(checkPersonal);
+    //debugger;//(1)
+    //链式调用，只要保证this指向始终是Chain的实例。
+    chainBasic.setNextSuccessor(chainMortgage).setNextSuccessor(chainPersonal);
+
+    //测试一下
+    var btn = document.getElementById('sub');
+    btn.onclick = function(){
+        chainBasic.passRequest();//启动链式验证
+    };
+</script>

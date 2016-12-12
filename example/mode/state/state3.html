@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>状态模式-分拆状态</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+//******************状态类********************//
+// 关灯状态
+    var OffState = function(light){
+        this.light = light;
+    };
+    OffState.prototype.pressButton = function(){
+        console.log('弱光');
+        this.light.setState(this.light.weak);
+    };
+// 弱光状态
+    var WeakState = function(light){
+        this.light = light;
+    };
+    WeakState.prototype.pressButton = function(){
+        console.log('强光');
+        this.light.setState(this.light.strong);
+    };
+    var StrongState = function(light){
+        this.light = light;
+    };
+// 强光状态
+    StrongState.prototype.pressButton = function(){
+        console.log('关灯');
+        this.light.setState(this.light.off);
+    };
+
+//******************灯类********************//
+    var Light = function(){
+        this.off = new OffState(this);
+        this.weak = new WeakState(this);
+        this.strong = new StrongState(this);
+        this.button = null;
+    };
+    Light.prototype.init = function(){
+        var button = document.createElement('button');
+        var _self = this;
+        this.button = document.body.appendChild(button);
+        this.button.innerHTML = '三种状态开关';
+        this.currentState = this.off;//设置当前状态为关闭状态
+        this.button.onclick = function(){
+            _self.currentState.pressButton();
+        };
+    };
+    Light.prototype.setState = function(newState){
+        this.currentState = newState;
+    };
+//******************测试一下*******************//
+    var light = new Light();
+    light.init();
+</script>

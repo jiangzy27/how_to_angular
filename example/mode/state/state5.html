@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>状态模式-js版的普遍写法</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+//******************状态机********************//
+    var StateMachine = {
+        off: {
+            pressButton: function () {
+                console.log('关灯');
+                /**
+                 *   this.button是灯类中的属性，我们可以在下面的代码中，通过this修正指向来得到它
+                 *  也就是说，我们可以将这里的this->StateMachine，修正为this->Light，
+                 *  通过call或者apply就能达到目的，
+                 *  只要Light类里面有button这个属性就行了。
+                 * **/
+                this.button.innerHTML = "下次按我是开灯";
+                /**
+                 *   this.currentState是灯类的属性，通过this修正指向可达到目的
+                 *  所以这里必须用StateMachine.on，如果用this.on，当this指向发生变化，是找不到on这个属性的。
+                 * */
+                this.currentState = StateMachine.on;
+            }
+        },
+        on:{
+            pressButton:function(){
+                console.log('开灯');
+
+                this.button.innerHTML="下次按我是关灯";
+
+                this.currentState = StateMachine.off;
+            }
+        }
+
+    };
+//******************灯类********************//
+    var Light = function(){
+        this.currentState = StateMachine.off;//默认是关灯状态
+        this.button = null;
+    };
+    Light.prototype.init = function(){
+        var button = document.createElement('button');
+        var _self = this;
+        button.innerHTML = '灯关了';
+        this.button = document.body.appendChild(button);
+
+        this.button.onclick = function(){
+            console.log(this);//this指向了button的dom节点
+//这里修正了指针状态，StateMachine里面的pressButton方法，this指针会修正为Light类。
+            console.log(_self.currentState);
+            _self.currentState.pressButton.apply(_self);
+        };
+    };
+
+//******************测试一下*******************//
+    var light = new Light();
+    light.init();
+</script>

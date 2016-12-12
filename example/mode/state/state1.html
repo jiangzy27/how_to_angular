@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>状态机-2种状态切换</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    var Light = function(){
+        this.state = 'off';//默认状态
+        this.button;
+    };
+    Light.prototype.init = function(){
+        var button = document.createElement('button');
+        var _self = this;
+        button.innerHTML='开关';
+        this.button = document.body.appendChild(button);
+        this.button.onclick = function(){
+          _self.pressButton();
+        };
+    };
+    Light.prototype.pressButton = function(){
+        if(this.state == 'off'){
+            console.log('开灯');
+            this.state = 'on';
+        }else if(this.state == 'on'){
+            console.log('关灯');
+            this.state = 'off';
+        }
+    };
+    var light = new Light();
+    light.init();
+</script>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>状态模式-委托函数</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+//******************状态机********************//
+    var StateMachine = {
+        off: {
+            pressButton: function () {
+                console.log('关灯');
+
+                this.button.innerHTML = "下次按我是开灯";
+
+                //通过委托的方式，this就可以放心使用了
+                //因为this虽然被指向了灯类，但是灯类内部也有this.on和this.off。
+                this.currentState = this.on;
+            }
+        },
+        on:{
+            pressButton:function(){
+                console.log('开灯');
+
+                this.button.innerHTML="下次按我是关灯";
+                //this被修正到Light类后，只要保证Light类有this.on和this.off即可。
+                this.currentState = this.off;
+            }
+        }
+
+    };
+//*****灯类的委托函数，帮助处理灯类this问题*****//
+var delegate = function(client,todoObj){
+    return {
+        pressButton:function(){
+            //把状态类的this统一修正为灯类
+            return todoObj.pressButton.apply(client,arguments);
+        }
+    };
+};
+//******************灯类********************//
+    var Light = function(){
+        this.off = delegate(this,StateMachine.off);
+        this.on = delegate(this,StateMachine.on);
+        this.currentState = this.off;
+        this.button = null;
+    };
+    Light.prototype.init = function(){
+        var button = document.createElement('button');
+        var _self = this;
+        button.innerHTML = '灯关了';
+        this.button = document.body.appendChild(button);
+
+        this.button.onclick = function(){
+            //这里不需处理this了,感谢委托函数的鼎力帮助哈^^
+            _self.currentState.pressButton();
+        };
+    };
+
+//******************测试一下*******************//
+    var light = new Light();
+    light.init();
+</script>
